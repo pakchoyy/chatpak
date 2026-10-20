@@ -3,10 +3,10 @@ import "./globals.css";
 import RegisterSW from "@/components/RegisterSW";
 
 export const metadata: Metadata = {
-  title: "Gambar",
-  description: "Buat gambar dari teks.",
+  title: "Chatpak",
+  description: "Ngobrol dan bikin gambar dari teks.",
   manifest: "/manifest.json",
-  appleWebApp: { capable: true, title: "Gambar", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "Chatpak", statusBarStyle: "default" },
   icons: { icon: "/icons/icon.svg", apple: "/icons/icon-192.png" },
 };
 
