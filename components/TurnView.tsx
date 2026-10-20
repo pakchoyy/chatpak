@@ -14,12 +14,12 @@ export default function TurnView({ turn, onRetry }: { turn: Turn; onRetry: (t: T
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-3xl bg-bubble px-4 py-2.5 text-[17px] leading-6">
+        <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl bg-bubble px-4 py-2.5 text-[16px] leading-6">
           {turn.prompt}
         </p>
       </div>
 
-      <div className="relative aspect-square w-full overflow-hidden rounded-3xl border border-line bg-surface">
+      <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-line bg-surface">
         {turn.url ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}

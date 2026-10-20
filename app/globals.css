@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #fafaf9;
-  --surface: #ffffff;
-  --border: #e7e5e4;
+  --bg: #f2f1ef;
+  --surface: #faf9f7;
+  --border: #e2dfdb;
   --text: #1c1917;
   --muted: #78716c;
   --accent: #1c1917;
   --accent-text: #fafaf9;
   --danger: #b91c1c;
-  --brand: #2f5fe3;
-  --brand-ink: #ffffff;
-  --bubble: #f0efed;
+  --brand: #1c1917;
+  --brand-ink: #faf9f7;
+  --bubble: #e8e6e2;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,7 +24,8 @@
     --accent: #fafaf9;
     --accent-text: #0c0a09;
     --danger: #f87171;
-    --brand: #4670ee;
+    --brand: #f2f1ef;
+    --brand-ink: #0c0a09;
     --bubble: #292524;
   }
 }
@@ -48,7 +49,7 @@ html {
 }
 
 body {
-  background: radial-gradient(120% 40% at 0% 0%, color-mix(in srgb, var(--text) 5%, var(--bg)), var(--bg)) no-repeat, var(--bg);
+  background: radial-gradient(120% 40% at 0% 0%, var(--bg), var(--bg)) no-repeat, var(--bg);
   color: var(--text);
   -webkit-tap-highlight-color: transparent;
 }

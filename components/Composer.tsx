@@ -23,7 +23,7 @@ export default function Composer({ value, loading, onChange, onSubmit }: Props) 
         e.preventDefault();
         if (can) onSubmit();
       }}
-      className="pointer-events-auto flex items-end gap-2 rounded-[28px] border border-line bg-surface py-2 pl-5 pr-2 shadow-[0_4px_24px_rgb(0_0_0/0.06)]"
+      className="pointer-events-auto rounded-3xl border border-line bg-surface p-3 shadow-[0_4px_24px_rgb(0_0_0/0.05)]"
     >
       <label htmlFor="prompt" className="sr-only">
         Prompt
@@ -35,9 +35,10 @@ export default function Composer({ value, loading, onChange, onSubmit }: Props) 
         value={value}
         maxLength={1000}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Jelaskan gambarnya…"
-        className="max-h-36 min-h-11 flex-1 resize-none bg-transparent py-2.5 text-[17px] leading-6 outline-none placeholder:text-muted"
+        placeholder="Mau bikin gambar apa hari ini?"
+        className="block max-h-36 min-h-12 w-full resize-none bg-transparent px-2 py-2 text-[17px] leading-6 outline-none placeholder:text-muted"
       />
+      <div className="flex justify-end pt-1">
       <button
         type="submit"
         disabled={!can}
@@ -46,6 +47,7 @@ export default function Composer({ value, loading, onChange, onSubmit }: Props) 
       >
         {loading ? <span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : <ArrowUpIcon />}
       </button>
+      </div>
     </form>
   );
 }

@@ -21,8 +21,12 @@ const read = (k: string) => {
   }
 };
 
-const roundBtn =
-  "grid size-12 place-items-center rounded-full border border-line bg-surface active:scale-95";
+const roundBtn = "grid size-12 place-items-center rounded-full active:bg-bubble";
+
+function greeting() {
+  const h = new Date().getHours();
+  return h < 11 ? "Selamat pagi" : h < 15 ? "Selamat siang" : h < 18 ? "Selamat sore" : "Selamat malam";
+}
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -35,6 +39,7 @@ export default function Home() {
   const [wrongCode, setWrongCode] = useState(false);
   const [demo, setDemo] = useState(false);
   const [used, setUsed] = useState(0);
+  const [hello, setHello] = useState("Halo");
   const urls = useRef<string[]>([]);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +51,7 @@ export default function Home() {
 
   useEffect(() => {
     setUsed(usedToday());
+    setHello(greeting());
     listItems()
       .then((l) => setEntries(l.map(toEntry)))
       .catch(() => {});
@@ -148,7 +154,10 @@ export default function Home() {
         <button onClick={() => setDrawer(true)} aria-label="Buka riwayat" className={roundBtn}>
           <MenuIcon />
         </button>
-        <h1 className="text-[17px] font-semibold">Gambar</h1>
+        <h1 className="rounded-full border border-line px-4 py-1.5 text-[13px] text-muted">
+          {demo && "Demo · "}
+          {used}/{DAILY_LIMIT} hari ini
+        </h1>
         <button onClick={reset} aria-label="Gambar baru" className={roundBtn}>
           <NewIcon />
         </button>
@@ -167,7 +176,14 @@ export default function Home() {
             }}
           />
         ) : turns.length === 0 ? (
-          <p className="pt-[22vh] text-center text-3xl font-semibold tracking-tight">Mau bikin gambar apa?</p>
+          <div className="flex flex-col items-center gap-4 pt-[20vh] text-center">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <rect x="3" y="3" width="18" height="18" rx="5" />
+              <circle cx="9" cy="9" r="1.6" />
+              <path d="M4 17l5-5 4 4 3-3 4 4" />
+            </svg>
+            <p className="font-serif text-[26px] tracking-tight">{hello}</p>
+          </div>
         ) : (
           turns.map((t) => <TurnView key={t.key} turn={t} onRetry={(x) => run(x.prompt, x.key)} />)
         )}
