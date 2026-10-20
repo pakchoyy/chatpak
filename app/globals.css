@@ -9,6 +9,9 @@
   --accent: #1c1917;
   --accent-text: #fafaf9;
   --danger: #b91c1c;
+  --brand: #2f5fe3;
+  --brand-ink: #ffffff;
+  --bubble: #f0efed;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -21,6 +24,8 @@
     --accent: #fafaf9;
     --accent-text: #0c0a09;
     --danger: #f87171;
+    --brand: #4670ee;
+    --bubble: #292524;
   }
 }
 
@@ -33,6 +38,9 @@
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-text);
   --color-danger: var(--danger);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-bubble: var(--bubble);
 }
 
 html {
@@ -40,7 +48,7 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background: radial-gradient(120% 40% at 0% 0%, color-mix(in srgb, var(--text) 5%, var(--bg)), var(--bg)) no-repeat, var(--bg);
   color: var(--text);
   -webkit-tap-highlight-color: transparent;
 }

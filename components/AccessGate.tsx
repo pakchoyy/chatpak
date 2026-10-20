@@ -10,10 +10,11 @@ export default function AccessGate({ onSubmit, wrong }: { onSubmit: (code: strin
         e.preventDefault();
         if (code.trim()) onSubmit(code.trim());
       }}
-      className="space-y-3 rounded-2xl border border-line bg-surface p-4"
+      className="mx-auto mt-24 w-full max-w-sm space-y-3 text-center"
     >
-      <label htmlFor="code" className="text-sm text-muted">
-        Masukkan kode akses
+      <h2 className="text-2xl font-semibold tracking-tight">Masukkan kode akses</h2>
+      <label htmlFor="code" className="sr-only">
+        Kode akses
       </label>
       <input
         id="code"
@@ -21,10 +22,10 @@ export default function AccessGate({ onSubmit, wrong }: { onSubmit: (code: strin
         autoComplete="off"
         value={code}
         onChange={(e) => setCode(e.target.value)}
-        className="w-full rounded-xl border border-line bg-bg p-3 text-base outline-none focus:border-ink"
+        className="h-14 w-full rounded-full border border-line bg-surface px-5 text-center text-[17px] outline-none focus:border-ink"
       />
       {wrong && <p className="text-sm text-danger">Kode salah.</p>}
-      <button className="min-h-12 w-full rounded-xl bg-accent font-medium text-accent-ink active:opacity-80">Masuk</button>
+      <button className="h-14 w-full rounded-full bg-brand text-[17px] font-semibold text-brand-ink active:opacity-80">Masuk</button>
     </form>
   );
 }
