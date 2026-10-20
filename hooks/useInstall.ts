@@ -6,6 +6,7 @@ type PromptEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ 
 
 // "native": Android/desktop Chrome bisa memunculkan dialog pasang.
 // "ios": Safari tidak punya dialog; tampilkan petunjuk manual.
+// "manual": browser belum memberi sinyal pasang; tampilkan petunjuk menu browser.
 export function useInstall() {
   const [evt, setEvt] = useState<PromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
@@ -33,7 +34,7 @@ export function useInstall() {
     };
   }, []);
 
-  const mode: "native" | "ios" | null = installed ? null : evt ? "native" : ios ? "ios" : null;
+  const mode: "native" | "ios" | "manual" | null = installed ? null : evt ? "native" : ios ? "ios" : "manual";
 
   async function install() {
     if (!evt) return;
