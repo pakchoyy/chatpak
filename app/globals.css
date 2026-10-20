@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f2f1ef;
+  --surface: #faf9f7;
+  --border: #e2dfdb;
+  --text: #1c1917;
+  --muted: #78716c;
+  --accent: #1c1917;
+  --accent-text: #fafaf9;
+  --danger: #b91c1c;
+  --brand: #1c1917;
+  --brand-ink: #faf9f7;
+  --bubble: #e8e6e2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c0a09;
+    --surface: #1c1917;
+    --border: #292524;
+    --text: #fafaf9;
+    --muted: #a8a29e;
+    --accent: #fafaf9;
+    --accent-text: #0c0a09;
+    --danger: #f87171;
+    --brand: #f2f1ef;
+    --brand-ink: #0c0a09;
+    --bubble: #292524;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-line: var(--border);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-text);
+  --color-danger: var(--danger);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-bubble: var(--bubble);
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  background: radial-gradient(120% 40% at 0% 0%, var(--bg), var(--bg)) no-repeat, var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--border) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
