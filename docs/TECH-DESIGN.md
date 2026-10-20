@@ -121,3 +121,11 @@ Request mengikuti format OpenAI Images (`model`, `prompt`, `n: 1`, `size`, `qual
 - Harga per gambar dan kebutuhan paket Pixel di Sekai, serta masa berlaku saldo.
 - Format respons dan parameter yang diterima `pixel/gpt-image-2` (ketahuan di langkah 2).
 - Batas durasi fungsi di plan Vercel yang kamu pakai.
+
+## 13. Tambahan v2: chat teks
+
+- `POST /api/chat` menerima `{ messages: [{ role, content }] }` (maks 30 pesan, 8000 karakter per pesan) dan membalas stream teks polos. Server mengubah SSE OpenAI menjadi potongan teks, dan membaca potongan pertama sebelum membalas supaya error di awal menjadi 502 yang jelas.
+- Mode Gambar adalah tombol di kolom prompt. Chat dan gambar ada di satu percakapan; ke model, gambar dikirim sebagai keterangan teks.
+- IndexedDB v2: store `chats` `{ id, title, createdAt, updatedAt, messages[] }`, maksimal 50 percakapan. Riwayat gambar v1 dipindahkan otomatis saat upgrade.
+- Stop membatalkan permintaan sampai ke penyedia. Kuota gambar harian dihitung saat dikirim, karena penyedia bisa tetap menagih.
+- Service worker: halaman memakai network-first dengan cadangan offline; file statis di-cache 7 hari; `/api` tidak pernah di-cache.

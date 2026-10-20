@@ -11,11 +11,13 @@ export class ProviderError extends Error {
 
 export const isDemoMode = () => !process.env.IMAGE_API_KEY;
 
-export async function generateImage(prompt: string): Promise<GeneratedImage> {
+export async function generateImage(prompt: string, signal?: AbortSignal): Promise<GeneratedImage> {
   if (isDemoMode()) return demoImage(prompt);
 
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 55_000);
+  const onAbort = () => ctrl.abort();
+  signal?.addEventListener("abort", onAbort);
   try {
     const res = await fetch(process.env.IMAGE_API_URL!, {
       method: "POST",
@@ -61,6 +63,7 @@ export async function generateImage(prompt: string): Promise<GeneratedImage> {
     throw new ProviderError("Tidak bisa menghubungi penyedia gambar.", 502);
   } finally {
     clearTimeout(timer);
+    signal?.removeEventListener("abort", onAbort);
   }
 }
 
@@ -85,4 +88,108 @@ async function demoImage(prompt: string): Promise<GeneratedImage> {
 <text x="64" y="96" font-size="28" fill="#fff" fill-opacity=".7" font-family="sans-serif">MODE DEMO</text>
 ${text}</svg>`;
   return { b64: Buffer.from(svg).toString("base64"), mime: "image/svg+xml" };
+}
+
+// ---------- Chat ----------
+
+export type ChatMessage = { role: "user" | "assistant" | "system"; content: string };
+
+const chatKey = () => process.env.CHAT_API_KEY || process.env.IMAGE_API_KEY;
+const chatUrl = () =>
+  process.env.CHAT_API_URL ||
+  (process.env.IMAGE_API_URL ?? "").replace(/\/images\/generations\/?$/, "/chat/completions");
+
+export const isChatDemo = () => !chatKey() || !process.env.CHAT_MODEL || !chatUrl();
+
+const SYSTEM =
+  "Kamu asisten yang ringkas dan membantu. Jawab dalam bahasa yang dipakai pengguna. Gunakan markdown bila membantu.";
+
+// Mengembalikan stream teks biasa (potongan jawaban), siap diteruskan ke browser.
+export async function chatStream(messages: ChatMessage[], signal: AbortSignal): Promise<ReadableStream<Uint8Array>> {
+  if (isChatDemo()) return demoStream(messages.at(-1)?.content ?? "", signal);
+
+  const res = await fetch(chatUrl(), {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${chatKey()}` },
+    body: JSON.stringify({
+      model: process.env.CHAT_MODEL,
+      stream: true,
+      messages: [{ role: "system", content: SYSTEM }, ...messages],
+    }),
+    signal,
+  }).catch((e) => {
+    if ((e as Error).name === "AbortError") throw e;
+    console.error("chat fetch failed", e);
+    throw new ProviderError("Tidak bisa menghubungi penyedia chat.", 502);
+  });
+
+  if (!res.ok || !res.body) {
+    const detail = await res.text().catch(() => "");
+    console.error("chat provider error", res.status, detail.slice(0, 500));
+    if (res.status === 429) throw new ProviderError("Penyedia sedang membatasi permintaan. Coba lagi sebentar.", 429);
+    if (res.status === 401 || res.status === 402 || res.status === 403)
+      throw new ProviderError("Akses ke penyedia ditolak. Periksa API key atau saldo.", 502);
+    throw new ProviderError("Penyedia chat gagal merespons.", 502);
+  }
+
+  // Ubah SSE OpenAI ("data: {...}") menjadi teks polos.
+  const enc = new TextEncoder();
+  const dec = new TextDecoder();
+  let buf = "";
+  const handle = (line: string, ctrl: TransformStreamDefaultController<Uint8Array>) => {
+    const data = line.replace(/^data:\s*/, "").trim();
+    if (!line.startsWith("data:") || !data || data === "[DONE]") return;
+    let json;
+    try {
+      json = JSON.parse(data);
+    } catch {
+      return; // baris aneh: lewati
+    }
+    if (json?.error) {
+      console.error("chat stream error", JSON.stringify(json.error).slice(0, 500));
+      ctrl.error(new Error("provider stream error"));
+      return;
+    }
+    const delta = json?.choices?.[0]?.delta?.content;
+    if (delta) ctrl.enqueue(enc.encode(delta));
+  };
+  return res.body.pipeThrough(
+    new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, ctrl) {
+        buf += dec.decode(chunk, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() ?? "";
+        for (const line of lines) handle(line, ctrl);
+      },
+      flush(ctrl) {
+        handle(buf + dec.decode(), ctrl);
+      },
+    }),
+  );
+}
+
+function demoStream(question: string, signal: AbortSignal): ReadableStream<Uint8Array> {
+  const text = `Ini **mode demo**, jadi jawabannya belum dari AI sungguhan.
+
+Pertanyaanmu: _${question.slice(0, 120).replace(/[*_`]/g, "")}_
+
+Setelah \`CHAT_MODEL\` dan API key diisi di Vercel, jawaban akan muncul di sini dengan cara yang sama:
+
+1. Teks muncul bertahap.
+2. Bisa dihentikan di tengah jalan.
+3. Bisa disalin atau diulang.
+
+\`\`\`js
+console.log("contoh blok kode");
+\`\`\``;
+  const enc = new TextEncoder();
+  const parts = text.match(/\S+\s*/g) ?? [text];
+  let i = 0;
+  return new ReadableStream({
+    async pull(ctrl) {
+      if (signal.aborted || i >= parts.length) return ctrl.close();
+      await new Promise((r) => setTimeout(r, 35));
+      ctrl.enqueue(enc.encode(parts[i++]));
+    },
+  });
 }
