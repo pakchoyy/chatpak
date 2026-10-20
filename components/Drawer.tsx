@@ -11,7 +11,7 @@ type Props = {
   used: number;
   limit: number;
   demo: boolean;
-  install: "native" | "ios" | null;
+  install: "native" | "ios" | "manual" | null;
   onInstall: () => void;
   onClose: () => void;
   onOpen: (id: string) => void;
@@ -91,7 +91,11 @@ export default function Drawer(p: Props) {
             </button>
             {iosHelp && (
               <p className="mx-3 mb-2 rounded-2xl bg-surface p-3 text-[14px] leading-5 text-muted">
-                Di Safari, ketuk <ShareIcon size={14} /> Bagikan, lalu pilih <b className="text-ink">Tambah ke Layar Utama</b>.
+                {p.install === "ios" ? (
+                  <>Di Safari, ketuk <ShareIcon size={14} /> Bagikan, lalu pilih <b className="text-ink">Tambah ke Layar Utama</b>.</>
+                ) : (
+                  <>Di Chrome, ketuk menu <b className="text-ink">⋮</b> di kanan atas, lalu pilih <b className="text-ink">Instal aplikasi</b> atau <b className="text-ink">Tambahkan ke layar utama</b>. Kalau versi lama sudah terpasang, hapus dulu dari layar utama.</>
+                )}
               </p>
             )}
           </div>
